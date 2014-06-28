@@ -1,8 +1,11 @@
 ﻿using Jok.GameEngine.Models;
+using Jok.Play;
 using Microsoft.AspNet.SignalR;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,7 +17,7 @@ namespace Jok.GameEngine
     {
     }
 
-    public abstract class GameHubBase<TConnection, TTable> : Hub
+    public abstract class GameHubBase<TConnection, TTable> : Hub, IGameHub
         where TConnection : GameHubConnection<TTable>, new()
         where TTable : class, IGameTable, new()
     {
@@ -32,9 +35,36 @@ namespace Jok.GameEngine
 
         static GameHubBase()
         {
+            try
+            {
+                JokAPI.GameID = Convert.ToInt32(ConfigurationManager.AppSettings["Jok:GameID"]);
+                JokAPI.GameSecret = ConfigurationManager.AppSettings["Jok:GameSecret"];
+            }
+            catch { Debug.WriteLine("Jok:GameID or Jok:GameSecret not found in web.config"); }
+
+
             Connections = new ConcurrentDictionary<string, TConnection>();
             Tables = new List<TTable>();
         }
+
+
+        public int ConnectionsCount
+        {
+            get
+            {
+                return Connections.Count;
+            }
+        }
+
+        public int TablesCount
+        {
+            get
+            {
+                return Tables.Count;
+            }
+        }
+
+
 
         protected virtual bool IsTablesEnabled
         {
