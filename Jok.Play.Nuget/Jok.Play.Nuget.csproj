@@ -111,6 +111,7 @@
     <Compile Include="Game\IGameHub.cs" />
     <Compile Include="Game\IGamePlayer.cs" />
     <Compile Include="Game\IGameTable.cs" />
+    <Compile Include="Jok.cs" />
     <Compile Include="JokAPI.cs" />
     <Compile Include="JokSharedInfo.cs" />
     <Compile Include="Models\GameFinishInfo.cs" />
