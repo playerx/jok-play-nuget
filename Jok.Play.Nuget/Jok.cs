@@ -14,9 +14,9 @@ namespace Jok.Play
     {
         static IHubContext Hub = GlobalHost.ConnectionManager.GetHubContext<T>();
 
-        public static void Send(ICallback to, Action<dynamic> command)
+        public static void Send(ICallback to, Action<dynamic> command, params ICallback[] exclude)
         {
-            var users = GetUsers(to);
+            var users = GetUsers(to, exclude);
             if (users == null)
             {
                 return;
