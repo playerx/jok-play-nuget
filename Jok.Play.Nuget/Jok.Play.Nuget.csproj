@@ -96,8 +96,8 @@
   <ItemGroup>
     <Compile Include="Controllers\InfoController.cs" />
     <Compile Include="GameControllerBase.cs" />
-    <Compile Include="GameHubBase.cs" />
-    <Compile Include="GameTableBase.cs" />
+    <Compile Include="Game\GameHubBase.cs" />
+    <Compile Include="Game\GameTableBase.cs" />
     <Compile Include="Hosting\WindowsService.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -108,9 +108,9 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ICallback.cs" />
-    <Compile Include="IGameHub.cs" />
-    <Compile Include="IGamePlayer.cs" />
-    <Compile Include="IGameTable.cs" />
+    <Compile Include="Game\IGameHub.cs" />
+    <Compile Include="Game\IGamePlayer.cs" />
+    <Compile Include="Game\IGameTable.cs" />
     <Compile Include="JokAPI.cs" />
     <Compile Include="JokSharedInfo.cs" />
     <Compile Include="Models\GameFinishInfo.cs" />

@@ -80,7 +80,7 @@ namespace Jok.GameEngine
         public override Task OnConnected()
         {
             var token = Context.QueryString["token"];
-            var ipaddress = Context.Request.Environment["server.RemoteIpAddress"].ToString();
+            var ipaddress = GetIpAddress();
             var connectionID = Context.ConnectionId;
             var channel = Context.QueryString["channel"] ?? String.Empty;
 
@@ -94,7 +94,7 @@ namespace Jok.GameEngine
         public override Task OnReconnected()
         {
             var token = Context.QueryString["token"];
-            var ipaddress = Context.Request.Environment["server.RemoteIpAddress"].ToString();
+            var ipaddress = GetIpAddress();
             var connectionID = Context.ConnectionId;
             var channel = Context.QueryString["channel"] ?? String.Empty;
 
@@ -112,7 +112,7 @@ namespace Jok.GameEngine
             return null;
         }
 
-        public override Task OnDisconnected()
+        public override Task OnDisconnected(bool isStopped)
         {
             var connectionID = Context.ConnectionId;
 
@@ -292,6 +292,19 @@ namespace Jok.GameEngine
 
             return null;
         }
+
+
+        protected string GetIpAddress()
+        {
+            var env = Get<IDictionary<string, object>>(Context.Request.Items, "owin.environment");
+            if (env == null)
+            {
+                return null;
+            }
+            var ipAddress = Get<string>(env, "server.RemoteIpAddress");
+            return ipAddress;
+        }
+
     }
 
 
