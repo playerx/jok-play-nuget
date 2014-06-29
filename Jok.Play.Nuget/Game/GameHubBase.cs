@@ -1,4 +1,4 @@
-﻿using Jok.GameEngine.Models;
+﻿using Jok.Play.Models;
 using Jok.Play;
 using Microsoft.AspNet.SignalR;
 using System;
@@ -9,8 +9,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNet.SignalR.Hosting;
 
-namespace Jok.GameEngine
+namespace Jok.Play
 {
     public abstract class GameHubBase<TTable> : GameHubBase<GameHubConnection<TTable>, TTable>
     where TTable : class, IGameTable, new()
@@ -25,7 +26,7 @@ namespace Jok.GameEngine
         public static List<TTable> Tables { get; set; }
         public static object TablesSyncObject = new object();
 
-        public static bool IsTournamentChannel(string channel) 
+        public static bool IsTournamentChannel(string channel)
         {
             if (String.IsNullOrWhiteSpace(channel)) return false;
 
@@ -80,7 +81,7 @@ namespace Jok.GameEngine
         public override Task OnConnected()
         {
             var token = Context.QueryString["token"];
-            var ipaddress = GetIpAddress();
+            var ipaddress = GetIPAddress();
             var connectionID = Context.ConnectionId;
             var channel = Context.QueryString["channel"] ?? String.Empty;
 
@@ -94,7 +95,7 @@ namespace Jok.GameEngine
         public override Task OnReconnected()
         {
             var token = Context.QueryString["token"];
-            var ipaddress = GetIpAddress();
+            var ipaddress = GetIPAddress();
             var connectionID = Context.ConnectionId;
             var channel = Context.QueryString["channel"] ?? String.Empty;
 
@@ -294,17 +295,16 @@ namespace Jok.GameEngine
         }
 
 
-        protected string GetIpAddress()
+        protected string GetIPAddress()
         {
-            var env = Get<IDictionary<string, object>>(Context.Request.Items, "owin.environment");
-            if (env == null)
+            object ipAddress;
+            if (Context.Request.Environment.TryGetValue("server.RemoteIpAddress", out ipAddress))
             {
-                return null;
+                return ipAddress as string;
             }
-            var ipAddress = Get<string>(env, "server.RemoteIpAddress");
-            return ipAddress;
-        }
+            return null;
 
+        }
     }
 
 

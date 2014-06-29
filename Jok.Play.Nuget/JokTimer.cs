@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace Jok.GameEngine
+namespace Jok.Play
 {
     class JokTimerInternal<T> : IJokTimer<T>
     {

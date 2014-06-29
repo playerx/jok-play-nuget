@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jok.GameEngine
+namespace Jok.Play
 {
     /// <summary>
     /// Represents a globally unique identifier (GUID) with a 

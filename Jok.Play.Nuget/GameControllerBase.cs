@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
-namespace Jok.GameEngine
+namespace Jok.Play
 {
     public abstract class GameControllerBase : Controller
     {

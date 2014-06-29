@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jok.GameEngine.Models
+namespace Jok.Play.Models
 {
     public class GameFinishResult
     {
