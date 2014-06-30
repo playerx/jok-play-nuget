@@ -47,7 +47,7 @@ namespace Jok.Play
             }
         }
 
-        public static GameFinishResult FinishGame(bool? isFullGame, bool? isDraw, string channel, params GameFinishPlayerInfo[] playerInfos)
+        public static GameFinishResult FinishGame(bool? isFullGame, bool? isDraw, string channel, string results, params GameFinishPlayerInfo[] playerInfos)
         {
             try
             {
@@ -61,6 +61,7 @@ namespace Jok.Play
                     IsFull = isFullGame,
                     IsDraw = isDraw,
                     Channel = channel,
+                    Results = results,
                     Players = playerInfos.ToList()
                 };
 

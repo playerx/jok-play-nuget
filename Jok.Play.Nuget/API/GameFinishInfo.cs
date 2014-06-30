@@ -36,5 +36,9 @@ namespace Jok.Play.Models
         /// [OPTIONAL] If set, players places are ignored
         /// </summary>
         public bool? IsDraw { get; set; }
+        /// <summary>
+        /// [OPTIONAL] Information about finished game, to make finish picture back
+        /// </summary>
+        public string Results { get; set; }
     }
 }

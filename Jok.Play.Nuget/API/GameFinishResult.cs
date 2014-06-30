@@ -14,6 +14,7 @@ namespace Jok.Play.Models
 
         public List<Item> Result { get; set; }
 
+        public string Key { get; set; }
         public string Details { get; set; }
 
         public class Item
