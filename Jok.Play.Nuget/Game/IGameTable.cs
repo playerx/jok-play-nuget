@@ -18,6 +18,8 @@ namespace Jok.Play
         List<string> IPAddresses { get; }
         List<int> UserIDs { get; }
         bool? IsVIPTable { get; set; }
+        bool IsDeleteAllowed { get; }
+        int Mode { get; set; }
 
         void Join(int userID, string connectionID, string ipaddress, bool isVIP, object state = null);
         void Leave(int userID, string connectionID);

@@ -17,6 +17,8 @@ namespace Jok.Play
         public Guid ID { get; set; }
         [DataMember]
         public string Channel { get; set; }
+        [DataMember]
+        public int Mode { get; set; }
         [IgnoreDataMember]
         public List<string> IPAddresses { get; set; }
         [IgnoreDataMember]
@@ -56,6 +58,14 @@ namespace Jok.Play
         public List<int> UserIDs { get; set; }
         [IgnoreDataMember]
         public bool? IsVIPTable { get; set; }
+        [IgnoreDataMember]
+        public virtual bool IsDeleteAllowed
+        {
+            get
+            {
+                return PlayersCount == 0 || OnlinePlayersCount == 0;
+            }
+        }
         #endregion
 
         protected GameTableBase<TGamePlayer> Table
@@ -113,6 +123,7 @@ namespace Jok.Play
                 RefreshIPAddressesAndUserIDs();
             }
         }
+
 
         protected abstract void OnJoin(TGamePlayer player, object state);
 

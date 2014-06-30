@@ -84,10 +84,13 @@ namespace Jok.Play
             var ipaddress = GetIPAddress();
             var connectionID = Context.ConnectionId;
             var channel = Context.QueryString["channel"] ?? String.Empty;
+            var modeString = Context.QueryString["mode"] ?? String.Empty;
+            var mode = 0;
+            Int32.TryParse(modeString, out mode);
 
             base.OnConnected().Wait();
 
-            ConnectedEvent(token, ipaddress, channel, connectionID);
+            ConnectedEvent(token, ipaddress, channel, connectionID, mode);
 
             return null;
         }
@@ -98,6 +101,9 @@ namespace Jok.Play
             var ipaddress = GetIPAddress();
             var connectionID = Context.ConnectionId;
             var channel = Context.QueryString["channel"] ?? String.Empty;
+            var modeString = Context.QueryString["mode"] ?? String.Empty;
+            var mode = 0;
+            Int32.TryParse(modeString, out mode);
 
 
             base.OnReconnected().Wait();
@@ -108,7 +114,7 @@ namespace Jok.Play
             if (Connections.TryGetValue(connectionID, out user))
                 return null;
 
-            ConnectedEvent(token, ipaddress, channel, connectionID);
+            ConnectedEvent(token, ipaddress, channel, connectionID, mode);
 
             return null;
         }
@@ -123,11 +129,11 @@ namespace Jok.Play
             if (!Connections.TryRemove(connectionID, out user))
                 return null;
 
-            if (IsTablesEnabled)
+            if (IsTablesEnabled && user.Table != null)
             {
                 user.Table.Leave(user.UserID, connectionID);
 
-                if (user.Table.PlayersCount == 0 || user.Table.OnlinePlayersCount == 0)
+                if (user.Table.IsDeleteAllowed)
                     lock (TablesSyncObject)
                     {
                         Tables.Remove(user.Table);
@@ -140,7 +146,7 @@ namespace Jok.Play
         }
 
 
-        protected virtual void ConnectedEvent(string token, string ipaddress, string channel, string connectionID)
+        protected virtual void ConnectedEvent(string token, string ipaddress, string channel, string connectionID, int mode)
         {
             try
             {
@@ -168,7 +174,8 @@ namespace Jok.Play
                     Channel = channel,
                     IPAddress = ipaddress,
                     IsVIP = isVIP,
-                    CultureName = userInfo.CultureName
+                    CultureName = userInfo.CultureName,
+                    Mode = mode
                 };
 
                 Groups.Add(connectionID, userid.ToString()).Wait();
@@ -281,6 +288,7 @@ namespace Jok.Play
             {
                 ID = Guid.NewGuid(),
                 Channel = conn.Channel,
+                Mode = conn.Mode,
                 IsVIPTable = IsTournamentChannel(conn.Channel) ? (bool?)conn.IsVIP : null
             };
         }
@@ -315,6 +323,7 @@ namespace Jok.Play
         public string IPAddress { get; set; }
         public bool IsVIP { get; set; }
         public string CultureName { get; set; }
+        public int Mode { get; set; }
         public TTable Table { get; set; }
     }
 
