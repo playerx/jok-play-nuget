@@ -256,6 +256,7 @@ namespace Jok.Play
             table = Tables.FirstOrDefault(t =>
                 t.Channel == conn.Channel &&
                 t.PlayersCount < t.MaxPlayersCount &&
+                t.Mode == conn.Mode &&
                 !t.IsStarted &&
                 !t.IsFinished &&
                 (!IsTournamentChannel(conn.Channel) || (conn.IsVIP == t.IsVIPTable && TournamentChannelValidations(t, conn.IPAddress))));
