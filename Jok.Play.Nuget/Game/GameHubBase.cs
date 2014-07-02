@@ -33,6 +33,17 @@ namespace Jok.Play
             return channel.ToLower().StartsWith("tournament");
         }
 
+        public static void RemoveTable(TTable table)
+        {
+            if (!table.IsDeleteAllowed) return;
+
+            lock (TablesSyncObject)
+            {
+                if (Tables.Contains(table))
+                    Tables.Remove(table);
+            }
+        }
+
 
         static GameHubBase()
         {
@@ -133,11 +144,7 @@ namespace Jok.Play
             {
                 user.Table.Leave(user.UserID, connectionID);
 
-                if (user.Table.IsDeleteAllowed)
-                    lock (TablesSyncObject)
-                    {
-                        Tables.Remove(user.Table);
-                    }
+                RemoveTable(user.Table);
 
                 user.Table = null;
             }
