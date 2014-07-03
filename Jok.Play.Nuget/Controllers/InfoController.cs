@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -22,6 +23,8 @@ namespace Jok.Play.Controllers
             }
             catch { }
 
+            var tables = Startup.GetTables();
+
             return Json(new
             {
                 Name = Startup.ApplicationName,
@@ -29,8 +32,24 @@ namespace Jok.Play.Controllers
                 UpTimeDays = (DateTime.Now - Startup.StartDate).TotalDays,
                 MemoryUsage = memoryInMB,
                 Connections = Startup.GetConnectionsCount(),
-                Tables = Startup.GetTablesCount()
+                Tables = tables.Count,
+                TablesStarted = tables.Count(t => t.IsStarted),
+                TablesFinished = tables.Count(t => t.IsFinished)
             });
+        }
+
+        [HttpGet]
+        public dynamic Tables(bool? isStarted = null, bool? isFinished = null)
+        {
+            var tables = Startup.GetTables();
+
+            if (isStarted.HasValue)
+                tables = tables.Where(t => t.IsStarted).ToList();
+
+            if (isFinished.HasValue)
+                tables = tables.Where(t => t.IsFinished).ToList();
+
+            return Json(tables);
         }
     }
 }

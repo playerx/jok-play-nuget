@@ -19,14 +19,14 @@ namespace Jok.Play
 {
     public class Startup
     {
-        public static void Configure(string applicationName, string serviceDisplayName, string serviceDescription, Func<int> getConnectionsCount, Func<int> getTablesCount)
+        public static void Configure(string applicationName, string serviceDisplayName, string serviceDescription, Func<int> getConnectionsCount, Func<List<IGameTable>> getTables)
         {
             ApplicationName = applicationName;
             ServiceDisplayName = serviceDisplayName;
             ServiceDescription = serviceDescription;
 
             GetConnectionsCount = getConnectionsCount;
-            GetTablesCount = getTablesCount;
+            GetTables = getTables;
         }
 
 
@@ -35,10 +35,11 @@ namespace Jok.Play
         public static string ServiceDescription { get; internal set; }
 
         internal static Func<int> GetConnectionsCount { get; private set; }
-        internal static Func<int> GetTablesCount { get; private set; }
+        internal static Func<List<IGameTable>> GetTables { get; private set; }
 
         internal static DateTime StartDate = DateTime.Now;
         public static Action<IAppBuilder> ConfigureApp;
+
 
         public void Configuration(IAppBuilder app)
         {
@@ -56,7 +57,7 @@ namespace Jok.Play
 
             config.Routes.MapHttpRoute(
                 name: "StatsApi",
-                routeTemplate: "stats",
+                routeTemplate: "{action}",
                 defaults: new { controller = "Info", action = "Stats", id = RouteParameter.Optional }
             );
 
@@ -65,6 +66,8 @@ namespace Jok.Play
             if (ConfigureApp != null)
                 ConfigureApp(app);
         }
+
+
 
         public static void Start(bool isConsole, string url)
         {

@@ -91,62 +91,85 @@ namespace Jok.Play
 
         public override Task OnConnected()
         {
-            var token = Context.QueryString["token"];
-            var ipaddress = GetIPAddress();
-            var connectionID = Context.ConnectionId;
-            var channel = Context.QueryString["channel"] ?? String.Empty;
-            var modeString = Context.QueryString["mode"] ?? String.Empty;
-            var mode = 0;
-            Int32.TryParse(modeString, out mode);
+            try
+            {
+                var token = Context.QueryString["token"];
+                var ipaddress = GetIPAddress();
+                var connectionID = Context.ConnectionId;
+                var channel = Context.QueryString["channel"] ?? String.Empty;
+                var modeString = Context.QueryString["mode"] ?? String.Empty;
+                var mode = 0;
+                Int32.TryParse(modeString, out mode);
 
-            base.OnConnected().Wait();
+                base.OnConnected().Wait();
 
-            ConnectedEvent(token, ipaddress, channel, connectionID, mode);
+                ConnectedEvent(token, ipaddress, channel, connectionID, mode);
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry(Startup.ApplicationName, ex.ToString(), EventLogEntryType.Warning);
+                this.Clients.Caller.Close(ex.ToString());
+            }
 
             return null;
         }
 
         public override Task OnReconnected()
         {
-            var token = Context.QueryString["token"];
-            var ipaddress = GetIPAddress();
-            var connectionID = Context.ConnectionId;
-            var channel = Context.QueryString["channel"] ?? String.Empty;
-            var modeString = Context.QueryString["mode"] ?? String.Empty;
-            var mode = 0;
-            Int32.TryParse(modeString, out mode);
+            try
+            {
+                var token = Context.QueryString["token"];
+                var ipaddress = GetIPAddress();
+                var connectionID = Context.ConnectionId;
+                var channel = Context.QueryString["channel"] ?? String.Empty;
+                var modeString = Context.QueryString["mode"] ?? String.Empty;
+                var mode = 0;
+                Int32.TryParse(modeString, out mode);
 
 
-            base.OnReconnected().Wait();
+                base.OnReconnected().Wait();
 
-            // თუ პამეხების გამო შიდა რეკონექტი იყო, არ სჭირდება მაშინ აქ არაფრის გაკეთება
-            // მემორიში საჭირო ინფო არის ისედაც
-            TConnection user;
-            if (Connections.TryGetValue(connectionID, out user))
-                return null;
+                // თუ პამეხების გამო შიდა რეკონექტი იყო, არ სჭირდება მაშინ აქ არაფრის გაკეთება
+                // მემორიში საჭირო ინფო არის ისედაც
+                TConnection user;
+                if (Connections.TryGetValue(connectionID, out user))
+                    return null;
 
-            ConnectedEvent(token, ipaddress, channel, connectionID, mode);
+                ConnectedEvent(token, ipaddress, channel, connectionID, mode);
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry(Startup.ApplicationName, ex.ToString(), EventLogEntryType.Warning);
+                this.Clients.Caller.Close(ex.ToString());
+            }
 
             return null;
         }
 
         public override Task OnDisconnected(bool isStopped)
         {
-            var connectionID = Context.ConnectionId;
-
-            base.OnDisconnected().Wait();
-
-            TConnection user;
-            if (!Connections.TryRemove(connectionID, out user))
-                return null;
-
-            if (IsTablesEnabled && user.Table != null)
+            try
             {
-                user.Table.Leave(user.UserID, connectionID);
+                var connectionID = Context.ConnectionId;
 
-                RemoveTable(user.Table);
+                base.OnDisconnected().Wait();
 
-                user.Table = null;
+                TConnection user;
+                if (!Connections.TryRemove(connectionID, out user))
+                    return null;
+
+                if (IsTablesEnabled && user.Table != null)
+                {
+                    user.Table.Leave(user.UserID, connectionID);
+
+                    RemoveTable(user.Table);
+
+                    user.Table = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry(Startup.ApplicationName, ex.ToString(), EventLogEntryType.Warning);
             }
 
             return null;
@@ -155,74 +178,67 @@ namespace Jok.Play
 
         protected virtual void ConnectedEvent(string token, string ipaddress, string channel, string connectionID, int mode)
         {
-            try
+            if (String.IsNullOrEmpty(token))
             {
-                if (String.IsNullOrEmpty(token))
-                {
-                    this.Clients.Caller.Close("Token not provided");
-                    return;
-                }
-
-                var userInfo = GetUserInfo(token, ipaddress);
-
-                if (userInfo.IsSuccess != true)
-                {
-                    this.Clients.Caller.Close("User info not found for token: " + token);
-                    return;
-                }
-
-                var userid = userInfo.UserID;
-                var isVIP = userInfo.IsVIP;
-
-
-                var conn = new TConnection
-                {
-                    UserID = userid,
-                    Channel = channel,
-                    IPAddress = ipaddress,
-                    IsVIP = isVIP,
-                    CultureName = userInfo.CultureName,
-                    Mode = mode
-                };
-
-                Groups.Add(connectionID, userid.ToString()).Wait();
-
-                // თუ მხოლოდ ერთი კონექშენია დაშვებული, დანარჩენებს ვთიშავთ
-                if (OneConnectionPerUserID)
-                {
-                    Clients.Group(conn.UserID.ToString(), connectionID).Close("Another connection is open");
-                }
-
-                // ვუგზავნით მომხმარებელს ინფორმაციას თუ რომელი იუზერია
-                Clients.Caller.UserAuthenticated(userid, true);
-                // ხოლო თუ კიდე არის სხვა მოერთებული იგივე იუზერ აიდით, იმასაც ვუგზავნით ინფოს რომ მოერთდა ვიღაც კიდე
-                if (!OneConnectionPerUserID)
-                    Clients.Group(conn.UserID.ToString(), connectionID).UserAuthenticated(userid, false);
-
-                if (!Connections.TryAdd(connectionID, conn))
-                {
-                    this.Clients.Caller.Close("User object add to Users collection failed");
-                    return;
-                }
-
-                if (IsTablesEnabled)
-                {
-                    conn.Table = GetTable(conn);
-
-                    if (conn.Table == null)
-                    {
-                        this.Clients.Caller.Close("User can't join table. User.Table is null");
-                        return;
-                    }
-
-                    //await Groups.Add(connectionID, user.Table.ID.ToString());
-
-                    conn.Table.Join(userid, connectionID, ipaddress, isVIP, conn);
-                }
+                this.Clients.Caller.Close("Token not provided");
+                return;
             }
-            catch (Exception ex)
+
+            var userInfo = GetUserInfo(token, ipaddress);
+
+            if (userInfo.IsSuccess != true)
             {
-                this.Clients.Caller.Close(ex.ToString());
+                this.Clients.Caller.Close("User info not found for token: " + token);
+                return;
+            }
+
+            var userid = userInfo.UserID;
+            var isVIP = userInfo.IsVIP;
+
+
+            var conn = new TConnection
+            {
+                UserID = userid,
+                Channel = channel,
+                IPAddress = ipaddress,
+                IsVIP = isVIP,
+                CultureName = userInfo.CultureName,
+                Mode = mode
+            };
+
+            Groups.Add(connectionID, userid.ToString()).Wait();
+
+            // თუ მხოლოდ ერთი კონექშენია დაშვებული, დანარჩენებს ვთიშავთ
+            if (OneConnectionPerUserID)
+            {
+                Clients.Group(conn.UserID.ToString(), connectionID).Close("Another connection is open");
+            }
+
+            // ვუგზავნით მომხმარებელს ინფორმაციას თუ რომელი იუზერია
+            Clients.Caller.UserAuthenticated(userid, true);
+            // ხოლო თუ კიდე არის სხვა მოერთებული იგივე იუზერ აიდით, იმასაც ვუგზავნით ინფოს რომ მოერთდა ვიღაც კიდე
+            if (!OneConnectionPerUserID)
+                Clients.Group(conn.UserID.ToString(), connectionID).UserAuthenticated(userid, false);
+
+            if (!Connections.TryAdd(connectionID, conn))
+            {
+                this.Clients.Caller.Close("User object add to Users collection failed");
+                return;
+            }
+
+            if (IsTablesEnabled)
+            {
+                conn.Table = GetTable(conn);
+
+                if (conn.Table == null)
+                {
+                    this.Clients.Caller.Close("User can't join table. User.Table is null");
+                    return;
+                }
+
+                //await Groups.Add(connectionID, user.Table.ID.ToString());
+
+                conn.Table.Join(userid, connectionID, ipaddress, isVIP, conn);
             }
         }
 
