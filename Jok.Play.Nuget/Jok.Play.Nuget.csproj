@@ -95,7 +95,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\InfoController.cs" />
-    <Compile Include="Extensions.cs" />
     <Compile Include="GameControllerBase.cs" />
     <Compile Include="Game\GameHubBase.cs" />
     <Compile Include="Game\GameTableBase.cs" />
