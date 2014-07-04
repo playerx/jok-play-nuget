@@ -152,7 +152,7 @@ namespace Jok.Play
             {
                 var connectionID = Context.ConnectionId;
 
-                base.OnDisconnected().Wait();
+                base.OnDisconnected(isStopped).Wait();
 
                 TConnection user;
                 if (!Connections.TryRemove(connectionID, out user))

@@ -58,7 +58,7 @@ namespace Jok.Play
             config.Routes.MapHttpRoute(
                 name: "StatsApi",
                 routeTemplate: "{action}",
-                defaults: new { controller = "Info", action = "Stats", id = RouteParameter.Optional }
+                defaults: new { controller = "Info", action = "Index", id = RouteParameter.Optional }
             );
 
             app.UseWebApi(config);

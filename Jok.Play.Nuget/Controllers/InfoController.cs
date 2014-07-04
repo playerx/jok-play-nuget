@@ -12,6 +12,15 @@ namespace Jok.Play.Controllers
     public class InfoController : ApiController
     {
         [HttpGet]
+        public dynamic Index()
+        {
+            return Json(new
+            {
+                Status = "Online"
+            });
+        }
+
+        [HttpGet]
         public dynamic Stats()
         {
             decimal memoryInMB = 0;
