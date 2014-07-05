@@ -19,6 +19,8 @@ namespace Jok.Play
         /// Default: https://api.jok.ge/game/{0}/finish
         /// </summary>
         public static string FinishGameUrl { get; set; }
+        public static string PlayerLoginUrl { get; set; }
+        public static string PlayerLogoutUrl { get; set; }
         public static int? GameID { get; set; }
         public static string GameSecret { get; set; }
 
@@ -28,6 +30,8 @@ namespace Jok.Play
             GameSecret = null;
             GetUserUrl = "http://api.jok.io/User/InfoBySID/?sid={0}&ipAddress={1}";
             FinishGameUrl = "http://api.jok.io/Game/Finish";
+            PlayerLoginUrl = "http://api.jok.io/Game/PlayerLogin";
+            PlayerLogoutUrl = "http://api.jok.io/Game/PlayerLogout";
         }
 
 
@@ -44,6 +48,39 @@ namespace Jok.Play
             catch
             {
                 return new JokUserInfo();
+            }
+        }
+
+        public static void PlayerLogin(int userID, string IPAddress)
+        {
+            try
+            {
+                var request = new HttpClient().PostAsJsonAsync(PlayerLoginUrl, new PlayerStatusChangeModel
+                {
+                    GameID = JokAPI.GameID,
+                    GameSecret = JokAPI.GameSecret,
+                    UserID = userID,
+                    IPAddress = IPAddress
+                });
+            }
+            catch
+            {
+            }
+        }
+
+        public static void PlayerLogout(int userID)
+        {
+            try
+            {
+                var request = new HttpClient().PostAsJsonAsync(PlayerLogoutUrl, new PlayerStatusChangeModel
+                {
+                    GameID = JokAPI.GameID,
+                    GameSecret = JokAPI.GameSecret,
+                    UserID = userID
+                });
+            }
+            catch
+            {
             }
         }
 

@@ -58,7 +58,7 @@ namespace Jok.Play
         public List<int> UserIDs { get; set; }
         [IgnoreDataMember]
         public bool? IsVIPTable { get; set; }
-        [IgnoreDataMember]
+        [DataMember]
         public virtual bool IsDeleteAllowed
         {
             get

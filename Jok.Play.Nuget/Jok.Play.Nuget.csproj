@@ -94,6 +94,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\PlayerStatusChangeModel.cs" />
     <Compile Include="Controllers\InfoController.cs" />
     <Compile Include="GameControllerBase.cs" />
     <Compile Include="Game\GameHubBase.cs" />
