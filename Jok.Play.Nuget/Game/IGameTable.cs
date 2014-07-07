@@ -20,6 +20,7 @@ namespace Jok.Play
         bool? IsVIPTable { get; set; }
         bool IsDeleteAllowed { get; }
         int Mode { get; set; }
+        DateTime CreateDate { get; }
 
         void Join(int userID, string connectionID, string ipaddress, bool isVIP, object state = null);
         void Leave(int userID, string connectionID);

@@ -66,6 +66,9 @@ namespace Jok.Play
                 return PlayersCount == 0 || OnlinePlayersCount == 0;
             }
         }
+        [DataMember]
+        public DateTime CreateDate { get; private set; }
+
         #endregion
 
         protected GameTableBase<TGamePlayer> Table
@@ -86,6 +89,7 @@ namespace Jok.Play
             ConnectionIDs = new List<string>();
             UserIDs = new List<int>();
             ActivePlayer = null;
+            CreateDate = DateTime.Now;
         }
 
 
@@ -132,6 +136,8 @@ namespace Jok.Play
 
         protected void AddPlayer(TGamePlayer player)
         {
+            if (Players.Contains(player)) return;
+
             Players.Add(player);
             RefreshIPAddressesAndUserIDs();
         }
@@ -181,6 +187,7 @@ namespace Jok.Play
             if (player == default(TGamePlayer)) return null;
 
             var index = Players.IndexOf(player);
+            if (index == -1) return null;
 
             return Players[index < Players.Count - 1 ? ++index : 0];
         }
