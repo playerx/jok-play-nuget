@@ -19,12 +19,13 @@ namespace Jok.Play
 {
     public class Startup
     {
-        public static void Configure(string applicationName, string serviceDisplayName, string serviceDescription, Func<int> getConnectionsCount, Func<List<IGameTable>> getTables)
+        public static void Configure(string applicationName, string serviceDisplayName, string serviceDescription, Func<int> getConnectionsCount, Func<List<IGameTable>> getTables, Func<int> getGroupConnectionsCount)
         {
             ApplicationName = applicationName;
             ServiceDisplayName = serviceDisplayName;
             ServiceDescription = serviceDescription;
 
+            GetGroupConnectionsCount = getGroupConnectionsCount;
             GetConnectionsCount = getConnectionsCount;
             GetTables = getTables;
         }
@@ -34,6 +35,7 @@ namespace Jok.Play
         public static string ServiceDisplayName { get; internal set; }
         public static string ServiceDescription { get; internal set; }
 
+        internal static Func<int> GetGroupConnectionsCount { get; set; }
         internal static Func<int> GetConnectionsCount { get; private set; }
         internal static Func<List<IGameTable>> GetTables { get; private set; }
 

@@ -28,10 +28,10 @@ namespace Jok.Play
         {
             GameID = null;
             GameSecret = null;
-            GetUserUrl = "http://api.jok.io/User/InfoBySID/?sid={0}&ipAddress={1}";
-            FinishGameUrl = "http://api.jok.io/Game/Finish";
-            PlayerLoginUrl = "http://api.jok.io/Game/PlayerLogin";
-            PlayerLogoutUrl = "http://api.jok.io/Game/PlayerLogout";
+            GetUserUrl = "https://api.jok.io/User/InfoBySID/?sid={0}&ipAddress={1}";
+            FinishGameUrl = "https://api.jok.io/Game/Finish";
+            PlayerLoginUrl = "https://api.jok.io/Game/PlayerLogin";
+            PlayerLogoutUrl = "https://api.jok.io/Game/PlayerLogout";
         }
 
 

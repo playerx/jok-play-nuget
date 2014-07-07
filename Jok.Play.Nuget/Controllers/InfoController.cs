@@ -44,7 +44,8 @@ namespace Jok.Play.Controllers
                 Connections = Startup.GetConnectionsCount(),
                 Tables = tables.Count,
                 TablesStarted = tables.Count(t => t.IsStarted),
-                TablesFinished = tables.Count(t => t.IsFinished)
+                TablesFinished = tables.Count(t => t.IsFinished),
+                GroupConnectionsCount = Startup.GetGroupConnectionsCount()
             });
         }
 
