@@ -26,6 +26,7 @@ namespace Jok.Play
         public static List<TTable> Tables { get; set; }
         public static object TablesSyncObject = new object();
 
+
         public static bool IsTournamentChannel(string channel)
         {
             if (String.IsNullOrWhiteSpace(channel)) return false;
@@ -51,6 +52,9 @@ namespace Jok.Play
             {
                 JokAPI.GameID = Convert.ToInt32(ConfigurationManager.AppSettings["Jok:GameID"]);
                 JokAPI.GameSecret = ConfigurationManager.AppSettings["Jok:GameSecret"];
+
+                GroupConnectionsSyncObject = new object();
+                GroupConnections = new List<ConnectionInfo>();
             }
             catch { Debug.WriteLine("Jok:GameID or Jok:GameSecret not found in web.config"); }
 
@@ -158,6 +162,8 @@ namespace Jok.Play
                 if (!Connections.TryRemove(connectionID, out user))
                     return null;
 
+                GroupRemove(connectionID, user.UserID);
+
                 if (IsTablesEnabled && user.Table != null)
                 {
                     user.Table.Leave(user.UserID, connectionID);
@@ -206,19 +212,23 @@ namespace Jok.Play
                 Mode = mode
             };
 
-            Groups.Add(connectionID, userid.ToString()).Wait();
+
+            //Groups.Add(connectionID, userid.ToString()).Wait();
+            GroupAdd(connectionID, userid);
 
             // თუ მხოლოდ ერთი კონექშენია დაშვებული, დანარჩენებს ვთიშავთ
             if (OneConnectionPerUserID)
             {
-                Clients.Group(conn.UserID.ToString(), connectionID).Close("Another connection is open");
+                //Clients.Group(conn.UserID.ToString(), connectionID).Close("Another connection is open");
+                Clients.Clients(GroupItems(conn.UserID, connectionID)).Close("Another connection is open");
             }
 
             // ვუგზავნით მომხმარებელს ინფორმაციას თუ რომელი იუზერია
             Clients.Caller.UserAuthenticated(userid, true);
             // ხოლო თუ კიდე არის სხვა მოერთებული იგივე იუზერ აიდით, იმასაც ვუგზავნით ინფოს რომ მოერთდა ვიღაც კიდე
             if (!OneConnectionPerUserID)
-                Clients.Group(conn.UserID.ToString(), connectionID).UserAuthenticated(userid, false);
+                //Clients.Group(conn.UserID.ToString(), connectionID).UserAuthenticated(userid, false);
+                Clients.Clients(GroupItems(conn.UserID, connectionID)).UserAuthenticated(userid, false);
 
             if (!Connections.TryAdd(connectionID, conn))
             {
@@ -326,7 +336,6 @@ namespace Jok.Play
             return null;
         }
 
-
         protected string GetIPAddress()
         {
             object ipAddress;
@@ -337,8 +346,54 @@ namespace Jok.Play
             return null;
 
         }
+
+
+        #region Groups
+        public static List<ConnectionInfo> GroupConnections { get; set; }
+        internal static object GroupConnectionsSyncObject { get; set; }
+
+        static void GroupAdd(string connectionID, int userID)
+        {
+            lock (GroupConnectionsSyncObject)
+            {
+                var item = GroupConnections.FirstOrDefault(g => g.UserID == userID && g.ConnectionID == connectionID);
+                if (item != null) return;
+
+                GroupConnections.Add(new ConnectionInfo { ConnectionID = connectionID, UserID = userID });
+            }
+        }
+
+        static void GroupRemove(string connectionID, int userID)
+        {
+            var item = GroupConnections.FirstOrDefault(c => c.ConnectionID == connectionID && c.UserID == userID);
+
+            lock (GroupConnectionsSyncObject)
+            {
+                if (GroupConnections.Contains(item))
+                    GroupConnections.Remove(item);
+            }
+        }
+
+        static List<string> GroupItems(int userID, params string[] exclude)
+        {
+            var items = new List<string>();
+
+            lock (GroupConnectionsSyncObject)
+            {
+                items = GroupConnections.Where(g => g.UserID == userID && !exclude.Contains(g.ConnectionID)).Distinct().Select(c => c.ConnectionID).ToList();
+            }
+
+            return items;
+        }
+        #endregion
     }
 
+
+    public class ConnectionInfo
+    {
+        public string ConnectionID { get; set; }
+        public int UserID { get; set; }
+    }
 
     public class GameHubConnection<TTable>
     {
