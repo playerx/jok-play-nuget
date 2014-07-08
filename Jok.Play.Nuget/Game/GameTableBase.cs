@@ -136,6 +136,11 @@ namespace Jok.Play
 
         protected void AddPlayer(TGamePlayer player)
         {
+            if (player == null) return;
+
+            if (ActivePlayer != null && ActivePlayer.UserID == player.UserID)
+                ActivePlayer = player;
+
             if (Players.Contains(player)) return;
 
             Players.Add(player);
@@ -144,6 +149,8 @@ namespace Jok.Play
 
         protected void RemovePlayer(TGamePlayer player)
         {
+            if (player == null) return;
+
             if (!Players.Contains(player)) return;
 
             Players.Remove(player);
