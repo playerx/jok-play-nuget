@@ -182,6 +182,24 @@ namespace Jok.Play
         }
 
 
+        protected virtual void TableCommand(Action<TTable, TConnection> command)
+        {
+            try
+            {
+                var user = GetCurrentUser();
+                if (user == null) return;
+                if (user.Table == null) return;
+
+                command(user.Table, user);
+            }
+            catch(Exception ex)
+            {
+                EventLog.WriteEntry(Startup.ApplicationName, ex.ToString(), EventLogEntryType.Error);
+            }
+        }
+
+
+
         protected virtual void ConnectedEvent(string token, string ipaddress, string channel, string connectionID, int mode)
         {
             if (String.IsNullOrEmpty(token))
