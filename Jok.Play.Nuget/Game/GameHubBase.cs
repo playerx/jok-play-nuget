@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR.Hosting;
+using Newtonsoft.Json;
 
 namespace Jok.Play
 {
@@ -198,6 +199,19 @@ namespace Jok.Play
             }
         }
 
+        protected void ProcessException(TTable table, Exception ex)
+        {
+            var tableJson = String.Empty;
+            try
+            {
+                tableJson = JsonConvert.SerializeObject(table);
+            }
+            catch { }
+
+            var errorString = String.Format("Error:{0}{1}{0}{0}TableInfo:{0}{2}{0}{0}", Environment.NewLine, ex.ToString(), tableJson);
+
+            EventLog.WriteEntry(Startup.ApplicationName, errorString, EventLogEntryType.Error);
+        }
 
 
         protected virtual void ConnectedEvent(string token, string ipaddress, string channel, string connectionID, int mode)
