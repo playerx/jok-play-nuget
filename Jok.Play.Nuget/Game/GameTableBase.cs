@@ -195,6 +195,8 @@ namespace Jok.Play
 
             if (player == default(TGamePlayer)) return null;
 
+            player = GetPlayer(player.UserID);
+
             var index = Players.IndexOf(player);
             if (index == -1) return null;
 
