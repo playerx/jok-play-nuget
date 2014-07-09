@@ -107,9 +107,14 @@ namespace Jok.Play
                 player.ConnectionIDs.Add(connectionID);
                 player.IsOnline = true;
 
+                if (!IsStarted && !IsFinished)
+                    AddPlayer(player);
+
                 RefreshIPAddressesAndUserIDs();
 
                 OnJoin(player, state);
+
+                JokAPI.PlayerLogin(player.UserID, player.IPAddress);
 
                 RefreshIPAddressesAndUserIDs();
             }
@@ -123,8 +128,13 @@ namespace Jok.Play
                 if (player == null) return;
                 if (!player.ConnectionIDs.Contains(connectionID)) return;
 
+                if (!IsStarted)
+                    RemovePlayer(player);
+
                 player.IsOnline = false;
                 OnLeave(player);
+
+                JokAPI.PlayerLogout(player.UserID);
 
                 RefreshIPAddressesAndUserIDs();
             }
@@ -136,7 +146,7 @@ namespace Jok.Play
         protected abstract void OnLeave(TGamePlayer player);
 
 
-        protected void AddPlayer(TGamePlayer player)
+        void AddPlayer(TGamePlayer player)
         {
             if (player == null) return;
 
@@ -149,7 +159,7 @@ namespace Jok.Play
             RefreshIPAddressesAndUserIDs();
         }
 
-        protected void RemovePlayer(TGamePlayer player)
+        void RemovePlayer(TGamePlayer player)
         {
             if (player == null) return;
 
@@ -159,7 +169,7 @@ namespace Jok.Play
             RefreshIPAddressesAndUserIDs();
         }
 
-        protected void RefreshIPAddressesAndUserIDs()
+        void RefreshIPAddressesAndUserIDs()
         {
             IPAddresses.Clear();
             ConnectionIDs.Clear();
@@ -180,6 +190,13 @@ namespace Jok.Play
                 });
             });
         }
+
+        protected void RemoveOfflinePlayers()
+        {
+            Players.RemoveAll(p => !p.IsOnline);
+            RefreshIPAddressesAndUserIDs();
+        }
+
 
         protected TGamePlayer GetPlayer(int userid)
         {

@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -63,8 +64,9 @@ namespace Jok.Play
                     IPAddress = IPAddress
                 });
             }
-            catch
+            catch (Exception ex)
             {
+                EventLog.WriteEntry(Startup.ApplicationName, ex.ToString(), EventLogEntryType.Information);
             }
         }
 
@@ -79,8 +81,9 @@ namespace Jok.Play
                     UserID = userID
                 });
             }
-            catch
+            catch (Exception ex)
             {
+                EventLog.WriteEntry(Startup.ApplicationName, ex.ToString(), EventLogEntryType.Information);
             }
         }
 
