@@ -242,7 +242,7 @@ namespace Jok.Play
             var tableJson = String.Empty;
             try
             {
-                tableJson = JsonConvert.SerializeObject(this);
+                tableJson = JsonConvert.SerializeObject(this, Formatting.Indented);
             }
             catch { }
 
