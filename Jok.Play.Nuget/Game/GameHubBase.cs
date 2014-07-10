@@ -112,7 +112,9 @@ namespace Jok.Play
             }
             catch (Exception ex)
             {
-                EventLog.WriteEntry(Startup.ApplicationName, ex.ToString(), EventLogEntryType.Warning);
+                var table = GetCurrentUser() == null ? default(TTable) : GetCurrentUser().Table;
+                ProcessException(table, ex);
+
                 this.Clients.Caller.Close(ex.ToString());
             }
 
@@ -144,7 +146,9 @@ namespace Jok.Play
             }
             catch (Exception ex)
             {
-                EventLog.WriteEntry(Startup.ApplicationName, ex.ToString(), EventLogEntryType.Warning);
+                var table = GetCurrentUser() == null ? default(TTable) : GetCurrentUser().Table;
+                ProcessException(table, ex);
+
                 this.Clients.Caller.Close(ex.ToString());
             }
 
@@ -176,7 +180,8 @@ namespace Jok.Play
             }
             catch (Exception ex)
             {
-                EventLog.WriteEntry(Startup.ApplicationName, ex.ToString(), EventLogEntryType.Warning);
+                var table = GetCurrentUser() == null ? default(TTable) : GetCurrentUser().Table;
+                ProcessException(table, ex);
             }
 
             return null;
@@ -204,11 +209,11 @@ namespace Jok.Play
             var tableJson = String.Empty;
             try
             {
-                tableJson = JsonConvert.SerializeObject(table);
+                tableJson = JsonConvert.SerializeObject(table, Formatting.Indented);
             }
             catch { }
 
-            var errorString = String.Format("Error:{0}{1}{0}{0}TableInfo:{0}{2}{0}{0}", Environment.NewLine, ex.ToString(), tableJson);
+            var errorString = String.Format("Error:{0}{1}{0}{0}TableInfo:{0}{2}{0}{0}CreateTime:{0}{3}{0}{0}", Environment.NewLine, ex.ToString(), tableJson, DateTime.Now);
 
             EventLog.WriteEntry(Startup.ApplicationName, errorString, EventLogEntryType.Error);
         }

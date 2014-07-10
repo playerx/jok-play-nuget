@@ -10,6 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 
@@ -38,6 +39,14 @@ namespace Jok.Play
         internal static Func<int> GetGroupConnectionsCount { get; set; }
         internal static Func<int> GetConnectionsCount { get; private set; }
         internal static Func<List<IGameTable>> GetTables { get; private set; }
+
+        internal static int ErrorsCount = 0;
+
+        internal static void AddError()
+        {
+            Interlocked.Increment(ref Startup.ErrorsCount);
+        }
+
 
         internal static DateTime StartDate = DateTime.Now;
         public static Action<IAppBuilder> ConfigureApp;
