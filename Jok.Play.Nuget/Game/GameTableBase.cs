@@ -237,7 +237,7 @@ namespace Jok.Play
             }
         }
 
-        protected void ProcessException(Exception ex)
+        protected void ProcessException(Exception ex, EventLogEntryType type = EventLogEntryType.Error)
         {
             var tableJson = String.Empty;
             try
@@ -250,7 +250,7 @@ namespace Jok.Play
 
             var errorString = String.Format("Error:{0}{1}{0}{0}TableInfo:{0}{2}{0}{0}CreateTime:{0}{3}{0}{0}", Environment.NewLine, ex.ToString(), tableJson, DateTime.Now);
 
-            EventLog.WriteEntry(Startup.ApplicationName, errorString, EventLogEntryType.Error);
+            EventLog.WriteEntry(Startup.ApplicationName, errorString, type);
         }
     }
 }
