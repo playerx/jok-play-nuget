@@ -213,6 +213,8 @@ namespace Jok.Play
             }
             catch { }
 
+            Startup.AddError();
+
             var errorString = String.Format("Error:{0}{1}{0}{0}TableInfo:{0}{2}{0}{0}CreateTime:{0}{3}{0}{0}", Environment.NewLine, ex.ToString(), tableJson, DateTime.Now);
 
             EventLog.WriteEntry(Startup.ApplicationName, errorString, EventLogEntryType.Error);
@@ -402,10 +404,10 @@ namespace Jok.Play
 
         static void GroupRemove(string connectionID, int userID)
         {
-            var item = GroupConnections.FirstOrDefault(c => c.ConnectionID == connectionID && c.UserID == userID);
-
             lock (GroupConnectionsSyncObject)
             {
+                var item = GroupConnections.FirstOrDefault(c => c.ConnectionID == connectionID && c.UserID == userID);
+
                 if (GroupConnections.Contains(item))
                     GroupConnections.Remove(item);
             }
