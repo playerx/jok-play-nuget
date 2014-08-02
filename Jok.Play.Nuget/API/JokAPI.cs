@@ -4,14 +4,18 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Jok.Play
 {
     public static class JokAPI
     {
+        static Regex _htmlRegex = new Regex("<.*?>", RegexOptions.Compiled);
+
         /// <summary>
         /// Default: https://api.jok.ge/user/{0}/info?ip={1}&gameid={2}
         /// </summary>
@@ -129,6 +133,25 @@ namespace Jok.Play
             {
                 return new GameFinishResult { Error = ex };
             }
+        }
+
+        public static bool CheckChatText(int userid, ref string msg, ref int? bannedDays)
+        {
+            if (String.IsNullOrEmpty(msg)) return false;
+
+            // Remove html stuff
+            msg = _htmlRegex.Replace(msg, string.Empty);
+
+            var checkResultString = new WebClient().DownloadString("http://api.jok.io/portal/checktext?gameid=12&userid=" + userid + "&text=" + msg);
+            var checkResult = JsonConvert.DeserializeObject<CheckTextResult>(checkResultString);
+
+            if (checkResult.IsSuccess)
+            {
+                return true;
+            }
+
+            bannedDays = checkResult.BanDays;
+            return false;
         }
     }
 }
