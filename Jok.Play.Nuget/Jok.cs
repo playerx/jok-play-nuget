@@ -32,7 +32,11 @@ namespace Jok.Play
             var result = new List<string>();
             var ignoreList = new List<string>();
 
-            exclude.ToList().ForEach(i1 => i1.ConnectionIDs.ForEach(ignoreList.Add));
+            exclude.ToList().ForEach(i1 =>
+            {
+                if (i1 != null)
+                    i1.ConnectionIDs.ForEach(ignoreList.Add);
+            });
 
             foreach (var item in to.ConnectionIDs)
             {
