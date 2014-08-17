@@ -10,7 +10,7 @@ using System.Timers;
 
 namespace Jok.Play
 {
-    class JokTimerInternal<T> : IJokTimer<T>
+    class JokTimerInternal<T> : IJokTimer<T>, IGlobalTimer
     {
         Timer timer;
 
@@ -74,5 +74,42 @@ namespace Jok.Play
         void SetInterval(Action<T> method, T state, int delayInMilliseconds);
         void SetTimeout(Action<T> method, T state, int delayInMilliseconds);
         void Stop();
+    }
+
+    interface IGlobalTimer
+    {
+        void Stop();
+    }
+
+    public static class Global
+    {
+        public static object SetTimeout<T>(Action<T> method, TimeSpan interval, T state = default(T))
+        {
+            var timer = new JokTimerInternal<T>();
+            timer.SetTimeout(method, state, Convert.ToInt32(interval.TotalMilliseconds));
+
+            return (IGlobalTimer)timer;
+        }
+
+        public static object SetInterval<T>(Action<T> method, TimeSpan interval, T state = default(T))
+        {
+            var timer = new JokTimerInternal<T>();
+            timer.SetInterval(method, state, Convert.ToInt32(interval.TotalMilliseconds));
+
+            return (IGlobalTimer)timer;
+        }
+
+        public static void ClearTimeout(object timer)
+        {
+            var item = (timer as IGlobalTimer);
+            if (item == null) return;
+
+            item.Stop();
+        }
+
+        public static void ClearInterval(object timer)
+        {
+            ClearTimeout(timer);
+        }
     }
 }
