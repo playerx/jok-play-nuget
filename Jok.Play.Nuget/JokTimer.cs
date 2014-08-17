@@ -99,6 +99,16 @@ namespace Jok.Play
             return (IGlobalTimer)timer;
         }
 
+        public static object SetTimeout(Action method, TimeSpan interval)
+        {
+            return SetTimeout<object>(o => method(), interval);
+        }
+
+        public static object SetInterval(Action method, TimeSpan interval)
+        {
+            return SetInterval<object>(o => method(), interval);
+        }
+
         public static void ClearTimeout(object timer)
         {
             var item = (timer as IGlobalTimer);
