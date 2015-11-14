@@ -16,11 +16,11 @@ namespace Jok.Play
     {
         #region IGameTable
         [DataMember]
-        public Guid ID { get; set; }
+        public virtual Guid ID { get; set; }
         [DataMember]
-        public string Channel { get; set; }
+        public virtual string Channel { get; set; }
         [DataMember]
-        public int Mode { get; set; }
+        public virtual int Mode { get; set; }
         [IgnoreDataMember]
         public List<string> IPAddresses { get; set; }
         [IgnoreDataMember]
@@ -59,7 +59,7 @@ namespace Jok.Play
         [IgnoreDataMember]
         public List<int> UserIDs { get; set; }
         [IgnoreDataMember]
-        public bool? IsVIPTable { get; set; }
+        public virtual bool? IsVIPTable { get; set; }
         [DataMember]
         public virtual bool IsDeleteAllowed
         {
@@ -69,7 +69,7 @@ namespace Jok.Play
             }
         }
         [DataMember]
-        public DateTime CreateDate { get; private set; }
+        public virtual DateTime CreateDate { get; private set; }
 
         #endregion
 
@@ -79,9 +79,9 @@ namespace Jok.Play
         }
 
         [DataMember]
-        public List<TGamePlayer> Players = new List<TGamePlayer>();
+        public virtual List<TGamePlayer> Players { get; set; }
         [DataMember]
-        public TGamePlayer ActivePlayer;
+        public virtual TGamePlayer ActivePlayer { get; set; }
 
         protected object SyncObject = new object();
 
@@ -90,6 +90,7 @@ namespace Jok.Play
             IPAddresses = new List<string>();
             ConnectionIDs = new List<string>();
             UserIDs = new List<int>();
+            Players = new List<TGamePlayer>();
             ActivePlayer = null;
             CreateDate = DateTime.Now;
         }
