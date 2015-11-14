@@ -251,7 +251,7 @@ namespace Jok.Play
 
             var errorString = String.Format("Error:{0}{1}{0}{0}TableInfo:{0}{2}{0}{0}CreateTime:{0}{3}{0}{0}", Environment.NewLine, ex.ToString(), tableJson, DateTime.Now);
 
-            EventLog.WriteEntry(Startup.ApplicationName, errorString, type);
+            //EventLog.WriteEntry(Startup.ApplicationName, errorString, type);
         }
     }
 }
