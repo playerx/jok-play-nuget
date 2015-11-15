@@ -229,7 +229,8 @@ namespace Jok.Play
                 return;
             }
 
-            var userInfo = GetUserInfo(token, ipaddress);
+            string responseString;
+            var userInfo = GetUserInfo(token, ipaddress, out responseString);
 
             if (userInfo.IsSuccess != true)
             {
@@ -248,7 +249,8 @@ namespace Jok.Play
                 IPAddress = ipaddress,
                 IsVIP = isVIP,
                 CultureName = userInfo.CultureName,
-                Mode = mode
+                Mode = mode,
+                UserInfoResponseString = responseString
             };
 
 
@@ -287,13 +289,13 @@ namespace Jok.Play
 
                 //await Groups.Add(connectionID, user.Table.ID.ToString());
 
-                conn.Table.Join(userid, connectionID, ipaddress, isVIP, conn);
+                conn.Table.Join(userid, connectionID, ipaddress, isVIP, conn, conn.UserInfoResponseString);
             }
         }
 
-        protected virtual JokUserInfo GetUserInfo(string token, string ipaddress)
+        protected virtual JokUserInfo GetUserInfo(string token, string ipaddress, out string responseString)
         {
-            return JokAPI.GetUser(token, ipaddress);
+            return JokAPI.GetUser(token, ipaddress, out responseString);
         }
 
         private TTable GetTable(TConnection conn)
@@ -443,6 +445,7 @@ namespace Jok.Play
         public string CultureName { get; set; }
         public int Mode { get; set; }
         public TTable Table { get; set; }
+        public string UserInfoResponseString { get; set; }
     }
 
 }

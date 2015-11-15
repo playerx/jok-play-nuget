@@ -96,7 +96,7 @@ namespace Jok.Play
         }
 
 
-        public void Join(int userid, string connectionID, string ipaddress, bool isVIP, object state = null)
+        public void Join(int userid, string connectionID, string ipaddress, bool isVIP, object state = null, string userInfoResponseString = "")
         {
             lock (SyncObject)
             {
@@ -113,7 +113,7 @@ namespace Jok.Play
 
                 RefreshIPAddressesAndUserIDs();
 
-                OnJoin(player, state);
+                OnJoin(player, state, userInfoResponseString);
 
                 JokAPI.PlayerLogin(player.UserID, player.IPAddress);
 
@@ -142,7 +142,7 @@ namespace Jok.Play
         }
 
 
-        protected abstract void OnJoin(TGamePlayer player, object state);
+        protected abstract void OnJoin(TGamePlayer player, object state, string userInfoResponseString);
 
         protected abstract void OnLeave(TGamePlayer player);
 
@@ -252,7 +252,7 @@ namespace Jok.Play
 
             var errorString = String.Format("Error:{0}{1}{0}{0}TableInfo:{0}{2}{0}{0}CreateTime:{0}{3}{0}{0}", Environment.NewLine, ex.ToString(), tableJson, DateTime.Now);
 
-            //EventLog.WriteEntry(Startup.ApplicationName, errorString, type);
+            EventLog.WriteEntry(Startup.ApplicationName, errorString, type);
         }
     }
 }

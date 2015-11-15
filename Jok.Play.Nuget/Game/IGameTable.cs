@@ -22,7 +22,7 @@ namespace Jok.Play
         int Mode { get; set; }
         DateTime CreateDate { get; }
 
-        void Join(int userID, string connectionID, string ipaddress, bool isVIP, object state = null);
+        void Join(int userID, string connectionID, string ipaddress, bool isVIP, object state = null, string userInfoResponseString = "");
         void Leave(int userID, string connectionID);
     }
 }

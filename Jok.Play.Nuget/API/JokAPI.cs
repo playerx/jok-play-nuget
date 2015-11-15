@@ -33,25 +33,28 @@ namespace Jok.Play
         {
             GameID = null;
             GameSecret = null;
-            GetUserUrl = "https://api.jok.io/User/InfoBySID/?sid={0}&ipAddress={1}";
+            GetUserUrl = "https://api.jok.io/User/InfoBySID/?sid={0}&ipAddress={1}&gameid={2}";
             FinishGameUrl = "https://api.jok.io/Game/Finish";
             PlayerLoginUrl = "https://api.jok.io/Game/PlayerLogin";
             PlayerLogoutUrl = "https://api.jok.io/Game/PlayerLogout";
         }
 
 
-        public static JokUserInfo GetUser(string token, string ipaddress)
+        public static JokUserInfo GetUser(string token, string ipaddress, out string responseString)
         {
             try
             {
-                var url = String.Format(GetUserUrl, token, ipaddress);
+                var url = String.Format(GetUserUrl, token, ipaddress, GameID);
                 var t = new HttpClient().GetStringAsync(url);
                 t.Wait();
+
+                responseString = t.Result;
 
                 return JsonConvert.DeserializeObject<JokUserInfo>(t.Result);
             }
             catch
             {
+                responseString = String.Empty;
                 return new JokUserInfo();
             }
         }
